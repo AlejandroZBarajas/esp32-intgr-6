@@ -1,19 +1,23 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <time.h>
 
 // Pines
 const int PIR_PIN = 13;
-const int TRIG_PIN = 12;
-const int ECHO_PIN = 14;
+const int TRIG_PIN = 19;
+const int ECHO_PIN = 21;
 
 // WiFi
-const char* ssid = "TU_SSID";
-const char* password = "TU_PASSWORD";
+const char* ssid = "INFINITUM1C29";
+const char* password = "maUk4yEP9d";
 
-// Servidor al que enviar el POST
-const char* serverUrl = "http://tuservidor.com/endpoint";
+// Servidor
+const char* serverUrl = "http://192.168.1.245:8080/atracciones";
 
-// Variables globales
+// Constante
+const char* nombreConstante = "test";
+
+// Variables
 bool pirState = false;
 bool timerRunning = false;
 unsigned long startTime = 0;
@@ -35,6 +39,17 @@ void setup() {
   Serial.println("\nWiFi conectado.");
   Serial.print("IP local: ");
   Serial.println(WiFi.localIP());
+
+  // Configurar NTP (zona horaria GMT-6, ajusta si lo necesitas)
+  configTime(-6 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+
+  // Esperar sincronización de hora
+  struct tm timeinfo;
+  while (!getLocalTime(&timeinfo)) {
+    Serial.println("Esperando hora NTP...");
+    delay(1000);
+  }
+  Serial.println("Hora sincronizada.");
 }
 
 void loop() {
@@ -43,20 +58,20 @@ void loop() {
 
   if (pirState) {
     if (!timerRunning && distance < 90) {
-      // Iniciar cronómetro
       startTime = millis();
       timerRunning = true;
       Serial.println("Cronómetro iniciado.");
-    }
+    } 
     else if (timerRunning && distance > 90) {
-      // Detener cronómetro
       elapsedTime = millis() - startTime;
       timerRunning = false;
+
+      float segundos = elapsedTime / 1000.0;
       Serial.print("Cronómetro detenido. Tiempo transcurrido: ");
-      Serial.print(elapsedTime / 1000.0);
+      Serial.print(segundos);
       Serial.println(" segundos.");
 
-      sendElapsedTime(elapsedTime / 1000.0); // Enviar en segundos
+      sendElapsedTime(segundos);
     }
 
     delay(2000); // evitar múltiples activaciones
@@ -76,17 +91,38 @@ float readUltrasonic() {
 }
 
 void sendElapsedTime(float seconds) {
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Error obteniendo la hora.");
+    return;
+  }
+
+  char horaStr[6];   // hh:mm
+  char fechaStr[11]; // yyyy-mm-dd
+  strftime(horaStr, sizeof(horaStr), "%H:%M", &timeinfo);
+  strftime(fechaStr, sizeof(fechaStr), "%Y-%m-%d", &timeinfo);
+
+  String json = "{";
+  json += "\"nombre\":\"" + String(nombreConstante) + "\",";
+  json += "\"tiempo\":" + String(seconds, 2) + ",";
+  json += "\"hora\":\"" + String(horaStr) + "\",";
+  json += "\"fecha\":\"" + String(fechaStr) + "\",";
+  json += "\"enviado\":false";
+  json += "}";
+
+  Serial.println("Enviando JSON:");
+  Serial.println(json);
+
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     http.begin(serverUrl);
     http.addHeader("Content-Type", "application/json");
 
-    String payload = "{\"time\": " + String(seconds, 2) + "}";
-
-    int httpResponseCode = http.POST(payload);
+    int httpResponseCode = http.POST(json);
 
     Serial.print("POST enviado. Código respuesta: ");
     Serial.println(httpResponseCode);
+
     if (httpResponseCode > 0) {
       String response = http.getString();
       Serial.println("Respuesta del servidor: " + response);
@@ -99,4 +135,3 @@ void sendElapsedTime(float seconds) {
     Serial.println("WiFi no conectado.");
   }
 }
-
