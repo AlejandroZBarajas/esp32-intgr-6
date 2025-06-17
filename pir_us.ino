@@ -102,9 +102,11 @@ void sendElapsedTime(float seconds) {
   strftime(horaStr, sizeof(horaStr), "%H:%M", &timeinfo);
   strftime(fechaStr, sizeof(fechaStr), "%Y-%m-%d", &timeinfo);
 
+  int segundosEnteros = (int)seconds;  // Convertir a entero truncando decimales
+
   String json = "{";
   json += "\"nombre\":\"" + String(nombreConstante) + "\",";
-  json += "\"tiempo\":" + String(seconds, 2) + ",";
+  json += "\"tiempo\":" + String(segundosEnteros) + ",";  // Aquí usas el entero
   json += "\"hora\":\"" + String(horaStr) + "\",";
   json += "\"fecha\":\"" + String(fechaStr) + "\",";
   json += "\"enviado\":false";
