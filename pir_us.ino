@@ -8,11 +8,11 @@ const int TRIG_PIN = 19;
 const int ECHO_PIN = 21;
 
 // WiFi
-const char* ssid = "INFINITUM1C29";
-const char* password = "maUk4yEP9d";
+const char* ssid = "arquitest";
+const char* password = "lapiola3";
 
 // Servidor
-const char* serverUrl = "http://192.168.1.245:8080/atracciones";
+const char* serverUrl = "http://10.203.103.233:8080/atracciones";
 
 // Constante
 const char* nombreConstante = "test";

@@ -3,11 +3,11 @@
 
 #define SENSOR_PIN 15  
 
-const char* ssid = "INFINITUM1C29";
-const char* password = "maUk4yEP9d";
+const char* ssid = "arquitest";
+const char* password = "lapiola3";
 
-const char* serverStart = "http://192.168.1.245:8080/webcam/start";
-const char* serverStop = "http://192.168.1.245:8080/webcam/stop";
+const char* serverStart = "http://10.203.103.233:8080/webcam/start";
+const char* serverStop = "http://10.203.103.233:8080/webcam/stop";
 
 bool puertaAbierta = false;
 int ultimoEstadoSensor = 1;  
