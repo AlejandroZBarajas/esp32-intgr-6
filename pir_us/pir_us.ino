@@ -5,17 +5,17 @@
 // Pines
 const int PIR_PIN = 13;
 const int TRIG_PIN = 19;
-const int ECHO_PIN = 21;
+const int ECHO_PIN = 23;
 
 // WiFi
-const char* ssid = "INFINITUM1C29";
-const char* password = "maUk4yEP9d";
+const char* ssid = "arquitest";
+const char* password = "lapiola3";
 
 // Servidor
-const char* serverUrl = "http://192.168.1.245:8080/atracciones";
+const char* serverUrl = "http://10.78.48.233:8080/atracciones";
 
 // Constante
-const char* nombreConstante = "test";
+const char* nombreConstante = "cuadro1";
 
 // Variables
 bool pirState = false;
